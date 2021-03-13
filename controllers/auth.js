@@ -1,12 +1,12 @@
 const db = require('../config/database')
 
-const index = async ( req, res ) => {
+const create = async ( req, res ) => {
     try {
       //const events = await dbCall;
 
       res.status(200).json({
         status: 200,
-        message: "Hello World",
+        message: "..creating a new user... please wait",
         requestAt: new Date().toLocaleString()
       });
   
@@ -19,8 +19,8 @@ const index = async ( req, res ) => {
     };
   };
 
-const indexCtrl = {
-  index,
+const authCtrl = {
+  create,
 }
 
-module.exports = indexCtrl;
+module.exports = authCtrl;
