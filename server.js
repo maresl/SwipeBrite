@@ -22,4 +22,4 @@ app.use( ( req, res, next ) => {
 
 app.use('/api/v1/events', indexRouter);
 
-app.listen( PORT, () => console.log( `listing at port ${PORT} \nhttp://localhost:${PORT}`) );
+app.listen( PORT, () => console.log( `listing at port ${PORT} \nhttp://localhost:${PORT}/api/v1/events`) );
