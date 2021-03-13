@@ -1,8 +1,14 @@
-const db = require('../config/database')
+const User = require('../models/User')
+const bcrypt = require('bcrypt')
 
 const create = async ( req, res ) => {
     try {
       //const events = await dbCall;
+
+      const saltRounds = 10
+      bcrypt.hash(password, saltRounds, function(err, hash) {
+        password = hash
+      })
 
       res.status(200).json({
         status: 200,
