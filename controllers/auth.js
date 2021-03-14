@@ -1,18 +1,18 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
+const jwt = require('../auth/jwt')
 
 const create = async ( req, res ) => {
     try {
       
       let {password} = req.body
-      const {email, avatar, likedEvents, dislikedEvents, blacklistEvents} = req.body
+      const {email, avatar} = req.body
       const duplicateUser = await User.findOne({email})
 
       //test for duplicate users
       if(duplicateUser) {
           return res.status().json({
               status: 400,
-              duplicateUser,
               message: "User already exists!",
               requestAt: new Date().toLocaleString()
           })
@@ -27,17 +27,15 @@ const create = async ( req, res ) => {
       const newUserData = {
         email, 
         password,
-        avatar, 
-        likedEvents, 
-        dislikedEvents, 
-        blacklistEvents
+        avatar
       }
 
       const newUserProfile = await User.create({newUserData});
+      const token = jwt.createToken(newUserProfile)
 
       return res.status(201).json({
         status: 201,
-        newUserProfile,
+        token,
         message: "New user created, booyah!",
         requestAt: new Date().toLocaleString()
       });
