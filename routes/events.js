@@ -5,6 +5,6 @@ const eventsCtrl = require('../controllers/events')
 
 
 // User Routes
-router.get('/', eventsCtrl.index);
+router.get('/new', eventsCtrl.newEvents);
 
 module.exports = router;
