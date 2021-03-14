@@ -4,7 +4,7 @@ const indexRouter = require('./routes/index')
 require('dotenv').config()
 
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 require('./config/database')
 
@@ -20,6 +20,7 @@ app.use( ( req, res, next ) => {
     next();
   });
 
-app.use('/api/v1/events', indexRouter);
+app.use('/api/v1/events', indexRouter.events);
+app.use('/api/v1/auth', indexRouter.auth);
 
 app.listen( PORT, () => console.log( `listing at port ${PORT} \nhttp://localhost:${PORT}/api/v1/events`) );

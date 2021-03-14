@@ -19,8 +19,8 @@ const index = async ( req, res ) => {
     };
   };
 
-const indexCtrl = {
+const eventsCtrl = {
   index,
 }
 
-module.exports = indexCtrl;
+module.exports = eventsCtrl;
