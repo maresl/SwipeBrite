@@ -1,15 +1,13 @@
 const mongoose = require("mongoose");
 
-(Schema = mongoose.Schema),
-  (bcrypt = require("bcrypt")),
-  (SALT_WORK_FACTOR = 10);
+const Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
   //email - < need email validator
   email: {
     type: Text,
     required: true,
-    index: { unique: true },
+    unique: true,
   },
 
   password: { type: String, required: true, minLength: 5, maxLength: 15 },
@@ -35,30 +33,6 @@ var UserSchema = new Schema({
     ref: "Event",
   },
 });
-
-UserSchema.pre("save", function (next) {
-  var user = this;
-
-  if (!user.isModified("password")) return next();
-  bcrypt.genSalt(SALT_WORK_FACTOR, function (err, salt) {
-    if (err) return next(err);
-    //hashing password
-    bcrypt.hash(user.password, salt, function (err, hash) {
-      if (err) return next(err);
-
-      //set password to be hash
-      user.password = hash;
-      next();
-    });
-  });
-});
-
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
-};
 
 const User = mongoose.model("User", UserSchema);
 
