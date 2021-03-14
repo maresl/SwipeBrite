@@ -78,6 +78,7 @@ const showLikedEvents = async ( req, res ) => {
   };
 }
 
+
 const eventsCtrl = {
   newEvents,
   showLikedEvents,

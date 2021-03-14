@@ -18,20 +18,26 @@ var UserSchema = new Schema({
     image: Buffer,
   },
 
-  likedEvents: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Event",
-  },
+  likedEvents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
 
-  dislikedEvents: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Event",
-  },
+  dislikedEvents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
 
-  blacklistEvents: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Event",
-  },
+  blacklistEvents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserSchema);
