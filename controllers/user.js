@@ -1,6 +1,6 @@
 const db = require("../config/database");
 const mongoose = require("mongoose");
-
+const filter = require("./utils/filterDecisionToUserArray").filter;
 /*
 Expecting: req to contain the user ID that we are updating
 Expecting: req to contain req.body.eventid --> the id that the user made a decision on
@@ -12,7 +12,24 @@ const updateUserEventPreferences = async (req, res) => {
     if (!mongoose.isValidObjectId(req.body.eventID))
       throw "Valid Event ID not passed";
 
-    const toBeUpdated = await db.User.findByIdAndUpdate(req.params.id, {});
+    /*
+    Assuming the route is going to look sometihng like "/user/:id/updateUserEventPreferences"
+    */
+    //added this util fcn just in case what we get does not match what we expect.
+
+    //$addToSet works on arrays, and if the user decision didnt exist in our db it would create it.
+    const filteredDecision = filter(req.body.decision);
+
+    const toBeUpdated = filteredDecision
+      ? await db.User.findByIdAndUpdate(req.params.id, {
+          $addToSet: {
+            //Filter from our utils
+            [filteredDecision]: req.body.eventID,
+          },
+          $position: 0,
+          new: true,
+        })
+      : false;
 
     res.status(200).json({
       status: 200,
