@@ -1,4 +1,5 @@
 const db = require('../config/database')
+const getAllEvents = require('../services/tmQueryService/tmEventQueries.js')
 // require the Ticketmaster API call service functions 
 
 const newEvents = async ( req, res ) => {
@@ -15,10 +16,10 @@ const newEvents = async ( req, res ) => {
 
         newEvents.push({
           eventID: newTMEvent.id,
-          priceRange: 0, // PLACEHOLDER - do we need to make another API call to get this?
+          priceRange: newTMEvent.priceRanges[0].min,
           dates: newTMEvent.dates.start.localDate,
           eventURL: newTMEvent.url,
-          description: '', // PLACEHOLDER - do we need to make another API call to get this?
+          description: newTMEvent.info, 
           classifications: newTMEvent.classifications[0].segment.name,
           venue: {
             location: newTMEvent['_embedded'].venues[0].location, // do we need this attribute? it's a latitude & longitude object
