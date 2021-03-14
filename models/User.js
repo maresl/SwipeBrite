@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 
 var UserSchema = new Schema({
   //email - < need email validator
-  username: {
+  email: {
     type: Text,
     required: true,
     index: { unique: true },

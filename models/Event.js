@@ -6,7 +6,6 @@ const EventSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-
   //TM API Events -> Price Range
   priceRange: {
     type: Number,
@@ -32,7 +31,7 @@ const EventSchema = mongoose.Schema({
   },
 
   //TM API Genres->name , ID is to have a reference for the api just in case .
-  genre: {
+  classifications: {
     type: String,
     id: Number,
   },
