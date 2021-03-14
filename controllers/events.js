@@ -1,12 +1,41 @@
 const db = require('../config/database')
+const getAllEvents = require('../services/tmQueryService/tmEventQueries.js')
+// require the Ticketmaster API call service functions 
 
-const index = async ( req, res ) => {
+const newEvents = async ( req, res ) => {
+
     try {
-      //const events = await dbCall;
+
+      // req.body should have the location data of the users (Lat and Long)
+      // call services / Ticketmaster API to get a list of events back based on the user location
+      const newTMEventsData = await getAllEvents(req.body.location)['_embedded'][events] // an array of TM event objects
+
+      const newEvents = [];
+
+      newTMEventsData.forEach( (newTMEvent) => {
+
+        newEvents.push({
+          eventID: newTMEvent.id,
+          priceRange: newTMEvent.priceRanges[0].min,
+          dates: newTMEvent.dates.start.localDate,
+          eventURL: newTMEvent.url,
+          description: newTMEvent.info, 
+          classifications: newTMEvent.classifications[0].segment.name,
+          venue: {
+            location: newTMEvent['_embedded'].venues[0].location, // do we need this attribute? it's a latitude & longitude object
+            name: newTMEvent['_embedded'].venues[0].name,
+            address: newTMEvent['_embedded'].venues[0].address
+          }
+          // can we add image url to Events schema?
+        })
+
+      })
+
+      const addedEvents = await db.Events.insertMany(newEvents)
 
       res.status(200).json({
         status: 200,
-        message: "Hello World",
+        addedEvents, // send all events found to front end. Front end can render 3 at a time, and call back end service again when the list runs out.
         requestAt: new Date().toLocaleString()
       });
   
@@ -19,8 +48,39 @@ const index = async ( req, res ) => {
     };
   };
 
+const showLikedEvents = async ( req, res ) => {
+
+  try {
+    const foundUser = await db.User.findById (req.user._id)
+
+    const likedEvents = []
+
+    foundUser.likedEvents.forEach( (event) => {
+
+      const foundEvent = await db.Events.findById(event)
+      likedEvents.push(foundEvent)
+
+    })
+
+    return res.status(200).json({
+      status: 200, 
+      likedEvents,
+      requestedAt: new Date().toLocaleString(),
+    })
+
+  } catch (error) {
+    
+    res.status(500).json({
+      status: 500,
+      error,
+      requestedAt: new Date().toLocaleDateString()
+    });
+  };
+}
+
 const eventsCtrl = {
-  index,
+  newEvents,
+  showLikedEvents,
 }
 
 module.exports = eventsCtrl;
