@@ -7,7 +7,7 @@ const newEvents = async ( req, res ) => {
 
       // req.body should have the location data of the users (Lat and Long)
       // call services / Ticketmaster API to get a list of events back based on the user location
-      const newTMEventsData = await getTMEvents(req.body.location)['_embedded'][events] // an array of TM event objects
+      const newTMEventsData = await getAllEvents(req.body.location)['_embedded'][events] // an array of TM event objects
 
       const newEvents = [];
 
@@ -47,8 +47,39 @@ const newEvents = async ( req, res ) => {
     };
   };
 
+const showLikedEvents = async ( req, res ) => {
+
+  try {
+    const foundUser = await db.User.findById (req.user._id)
+
+    const likedEvents = []
+
+    foundUser.likedEvents.forEach( (event) => {
+
+      const foundEvent = await db.Events.findById(event)
+      likedEvents.push(foundEvent)
+
+    })
+
+    return res.status(200).json({
+      status: 200, 
+      likedEvents,
+      requestedAt: new Date().toLocaleString(),
+    })
+
+  } catch (error) {
+    
+    res.status(500).json({
+      status: 500,
+      error,
+      requestedAt: new Date().toLocaleDateString()
+    });
+  };
+}
+
 const eventsCtrl = {
   newEvents,
+  showLikedEvents,
 }
 
 module.exports = eventsCtrl;
