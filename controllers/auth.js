@@ -33,11 +33,11 @@ const create = async ( req, res ) => {
         blacklistEvents
       }
 
-      const newUser = await User.create({newUserData});
+      const newUserProfile = await User.create({newUserData});
 
       return res.status(201).json({
         status: 201,
-        newUser,
+        newUserProfile,
         message: "New user created, booyah!",
         requestAt: new Date().toLocaleString()
       });
