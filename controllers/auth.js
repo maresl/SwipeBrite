@@ -3,21 +3,47 @@ const bcrypt = require('bcrypt')
 
 const create = async ( req, res ) => {
     try {
-      //const events = await dbCall;
+      
+      let {password} = req.body
+      const {email, avatar, likedEvents, dislikedEvents, blacklistEvents} = req.body
+      const duplicateUser = await User.findOne({email})
 
+      //test for duplicate users
+      if(duplicateUser) {
+          return res.status().json({
+              status: 400,
+              duplicateUser,
+              message: "User already exists!",
+              requestAt: new Date().toLocaleString()
+          })
+      }
+
+      //hash password
       const saltRounds = 10
       bcrypt.hash(password, saltRounds, function(err, hash) {
         password = hash
       })
 
-      res.status(200).json({
-        status: 200,
-        message: "..creating a new user... please wait",
+      const newUserData = {
+        email, 
+        password,
+        avatar, 
+        likedEvents, 
+        dislikedEvents, 
+        blacklistEvents
+      }
+
+      const newUser = await User.create({newUserData});
+
+      return res.status(201).json({
+        status: 201,
+        newUser,
+        message: "New user created, booyah!",
         requestAt: new Date().toLocaleString()
       });
   
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         status: 500,
         message: "Something went wrong!",
         requestAt: new Date().toLocaleString()
