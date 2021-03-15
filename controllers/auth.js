@@ -67,16 +67,7 @@ const login = async (req, res) => {
     //test if user's password matches what's in the database
     const isMatch = await bcrypt.compare(password, foundUser.password);
     if (isMatch) {
-      const signedJwt = jwt.sign(
-        {
-          /* payload */ _id: foundUser._id,
-          firstName: foundUser.firstName,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "24h",
-        }
-      );
+      const signedJwt = jwt.createToken(foundUser);
 
       return res.status(200).json({
         status: 200,
