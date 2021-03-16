@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 var UserSchema = new Schema({
   //email - < need email validator
   email: {
-    type: Text,
+    type: String,
     required: true,
     unique: true,
   },
