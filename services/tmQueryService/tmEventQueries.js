@@ -14,6 +14,8 @@
  * 20 miles,
  */
 const axios = require("axios");
+let today = new Date();
+let twomonths = new Date(today.setDate(today.getDate() + 60)).toISOString();
 const eventConfig = {
   RADIUS: 20,
 
@@ -23,8 +25,8 @@ const eventConfig = {
     endDateTime: Today's date + 60 days
     */
   TIMEFRAME: {
-    startDateTime: new Date().toISOString().slice(0, 10),
-    endDateTime: (new Date().getDate() + 60).toISOString().slice(0, 10),
+    startDateTime: today.toISOString().slice(0, 10),
+    endDateTime: twomonths.slice(0, 10),
   },
 };
 /**
