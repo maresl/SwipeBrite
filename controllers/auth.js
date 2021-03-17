@@ -5,7 +5,7 @@ const jwt = require("../auth/jwt");
 const create = async (req, res) => {
   try {
     let { password } = req.body;
-    const { email, avatar } = req.body;
+    const { email } = req.body;
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
