@@ -50,18 +50,21 @@ const create = async (req, res) => {
 
 /* NOTE Login */
 const login = async (req, res) => {
+  console.log("made it to controller");
   try {
-    const { email, password } = req.body;
-
+    const { email, password } = await req.body;
+    console.log(email, password);
     //test for empty credential input
     if (email === "" || password === "") {
       throw "emptyForm";
     }
 
-    const foundUser = await db.User.findOne({ email });
+    console.log("waiting...");
+    const foundUser = await User.findOne({ email: email });
 
     //test if user/email does NOT exist in the database
     if (!foundUser) {
+      console.log("user not found,");
       throw "invalidUser";
     }
 
