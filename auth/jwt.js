@@ -5,7 +5,7 @@ const createToken = (user) => {
     email: user.email,
     id: user._id,
   };
-  const token = jwt.sign(payload, process.env.JWT_SECRET);
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "24h" });
   return token;
 };
 
@@ -17,4 +17,4 @@ const decodeUser = (token) => {
 module.exports = {
   createToken,
   decodeUser,
-}
+};

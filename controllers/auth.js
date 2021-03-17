@@ -5,7 +5,7 @@ const jwt = require("../auth/jwt");
 const create = async (req, res) => {
   try {
     let { password } = req.body;
-    const { email, avatar } = req.body;
+    const { email } = req.body;
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
@@ -26,7 +26,6 @@ const create = async (req, res) => {
     const newUserData = {
       email,
       password,
-      avatar,
     };
 
     const newUserProfile = await User.create({ newUserData });
@@ -67,16 +66,7 @@ const login = async (req, res) => {
     //test if user's password matches what's in the database
     const isMatch = await bcrypt.compare(password, foundUser.password);
     if (isMatch) {
-      const signedJwt = jwt.sign(
-        {
-          /* payload */ _id: foundUser._id,
-          firstName: foundUser.firstName,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "24h",
-        }
-      );
+      const signedJwt = jwt.createToken(foundUser);
 
       return res.status(200).json({
         status: 200,
