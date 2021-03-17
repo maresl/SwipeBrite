@@ -4,8 +4,8 @@ const jwt = require("../auth/jwt");
 
 const create = async (req, res) => {
   try {
-    let { password } = req.body;
-    const { email } = req.body;
+    let { password, email } = req.body;
+    console.log(password, email);
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
@@ -29,6 +29,7 @@ const create = async (req, res) => {
     };
 
     const newUserProfile = await User.create({ newUserData });
+
     const token = jwt.createToken(newUserProfile);
 
     return res.status(201).json({
@@ -38,6 +39,7 @@ const create = async (req, res) => {
       requestAt: new Date().toLocaleString(),
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: 500,
       message: "Something went wrong!",
