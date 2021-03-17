@@ -21,6 +21,7 @@ const create = async (req, res) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSaltSync(saltRounds);
     const hash = await bcrypt.hashSync(password, salt);
+
     password = hash;
 
     const newUserData = {
@@ -51,7 +52,6 @@ const create = async (req, res) => {
 
 /* NOTE Login */
 const login = async (req, res) => {
-  console.log("made it to controller"); //ok
   try {
     let email = req.body.email;
     let password = req.body.password;
