@@ -60,8 +60,7 @@ const login = async (req, res) => {
       throw "emptyForm";
     }
 
-    const foundUser = await User.findOne({ email: email }).exec();
-    console.log(email, "foundUser:", foundUser, password); //ok
+    const foundUser = await User.findOne({ email });
 
     //test if user/email does NOT exist in the database
     if (!foundUser) {
@@ -71,7 +70,7 @@ const login = async (req, res) => {
 
     //test if user's password matches what's in the database
     const isMatch = await bcrypt.compare(password, foundUser.password);
-    console.log(isMatch);
+
     if (isMatch) {
       const signedJwt = jwt.createToken(foundUser);
 
