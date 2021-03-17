@@ -36,13 +36,9 @@ const eventConfig = {
  */
 const getAllEvents = async (latLong) => {
   try {
+    console.log(latLong.lat, latLong.long);
     return await axios.get(
-      `https://app.ticketmaster.com/discovery/v2/
-      events?
-      apikey=${TICKETMASTER_API_KEY}
-      &latlong=${latLong.lat},${latLong.long}
-      &radius=${eventConfig.RADIUS}
-      &locale=*`
+      `https://app.ticketmaster.com/discovery/v2/events?apikey=${process.env.TICKETMASTER_API_KEY}&latlong=${latLong.lat},${latLong.long}&radius=25&locale=*`
     );
   } catch (error) {
     console.log(error);

@@ -35,6 +35,7 @@ const create = async (req, res) => {
     return res.status(201).json({
       status: 201,
       token,
+      newUserProfile,
       message: "New user created, booyah!",
       requestAt: new Date().toLocaleString(),
     });
@@ -52,15 +53,15 @@ const create = async (req, res) => {
 const login = async (req, res) => {
   console.log("made it to controller");
   try {
-    const { email, password } = await req.body;
-    console.log(email, password);
+    let email = req.body.email;
+    let password = req.body.password;
     //test for empty credential input
     if (email === "" || password === "") {
       throw "emptyForm";
     }
 
-    console.log("waiting...");
-    const foundUser = await User.findOne({ email: email });
+    const foundUser = await User.findOne({ email: email }).exec();
+    console.log(email, "foundUser:", foundUser, password);
 
     //test if user/email does NOT exist in the database
     if (!foundUser) {
