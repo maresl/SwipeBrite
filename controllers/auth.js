@@ -4,8 +4,8 @@ const jwt = require("../auth/jwt");
 
 const create = async (req, res) => {
   try {
-    let { password, email } = req.body;
-    console.log(password, email);
+    let email = req.body.email;
+    let password = req.body.password;
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
@@ -28,7 +28,7 @@ const create = async (req, res) => {
       password,
     };
 
-    const newUserProfile = await User.create({ newUserData });
+    const newUserProfile = await User.create(newUserData);
 
     const token = jwt.createToken(newUserProfile);
 
@@ -91,7 +91,7 @@ const login = async (req, res) => {
       });
     }
 
-    console.log(error);
+    // console.log(error);
   }
 };
 
