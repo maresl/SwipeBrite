@@ -5,17 +5,15 @@ const getNewEvents = require("../services/tmQueryService/tmEventQueries.js");
 
 const newEvents = async (req, res) => {
   try {
-    console.log("made it to newEvents function");
-
     const foundUser = await User.findById(req.user.id)
     
     const newLocation = `${req.body.lat} ${req.body.lng}` // formatting the Location data to match User model
 
-    if (foundUser.location !== newLocation || foundUser.eventQueue.length < 5) { // Only need to proceed if the Location has changed or the queue is too short:
+    if (foundUser.currentLatLng !== newLocation || foundUser.eventQueue.length < 5) { // Only need to proceed if the Location has changed or the queue is too short:
       
       console.log('calling ticketmaster')
 
-      await User.findByIdAndUpdate(req.user._id, {location: newLocation}) // save the new location to the user
+      await User.findByIdAndUpdate(foundUser._id, {currentLatLng: newLocation}) // save the new location to the user < this is not working
 
       const newTMEventsData = await getNewEvents({...req.body});
       // console.log(newTMEventsData.data);
@@ -25,31 +23,41 @@ const newEvents = async (req, res) => {
 
       let newEvents = []
 
-      eventsForQueue.forEach((newTMEvent) => {
-        //let existingEvent = Event.findOne() // TODO : figure out how to find by the event name // see if this event already exists
-        let foundReviewedEvent = null
+
+
+      for (let i = 0; i < eventsForQueue.length; i++) {
+
+        let existingEvent = await Event.findOne({eventID: eventsForQueue[i].id}) // TODO : figure out how to find by the event name // see if this event already exists
+        //console.log("EXISTING EVENT:", existingEvent.eventID)
+
+        let inHistory = -1
         if (existingEvent) {
-       //   foundReviewedEvent = foundUser.eventHistory.filter(existingEvent._id) // if the event already exists, see if the user already reviewed it
+          inHistory = foundUser.eventHistory.indexOf(existingEvent._id) // if the event already exists, see if the user already reviewed it
         }
-        // if (!foundReviewedEvent) { // if the user hasn't already reviewed it, put it it in the array which will be added to the queue
-        //   foundUser.eventHistory.push()
-        //   const new Event = await Event.create({
-        //     eventID: newTMEvent.id,
-        //     priceRange: newTMEvent.priceRanges[0].min,
-        //     dates: newTMEvent.dates.start.localDate,
-        //     eventURL: newTMEvent.url,
-        //     description: newTMEvent.info,
-        //     classifications: newTMEvent.classifications[0].segment.name,
-        //     venue: {
-        //       name: newTMEvent["_embedded"].venues[0].name,
-        //     }, // image url not handled yet
-        //   });
-        //}
-      });
-      console.log("==============ARRAY TO BE ADDED TO EVENTS DATABASE==============")
-      console.log(newEvents)
-      //const addedEvents = await db.Events.insertMany(newEvents);
+        if (inHistory === -1) { // if the user hasn't already reviewed it, put it it in the array which will be added to the queue
+          
+          const newEvent = await Event.create({
+            eventID: eventsForQueue[i].id,
+            priceRange: eventsForQueue[i].priceRanges[0].min,
+            dates: eventsForQueue[i].dates.start.localDate,
+            eventURL: eventsForQueue[i].url,
+            description: eventsForQueue[i].info,
+            classifications: eventsForQueue[i].classifications[0].segment.name,
+            venue: {
+              name: eventsForQueue[i]["_embedded"].venues[0].name,
+            }, // image url not handled yet
+          });
+          console.log("new event:", newEvent.eventID)
+          foundUser.eventHistory.push(newEvent._id)
+          foundUser.eventQueue.push(newEvent._id)
+          await foundUser.save()
+        } else {
+          console.log("skipping ", eventsForQueue[i].id)
+        }
+      };
     }
+    //console.log("eventHistory:", foundUser.eventHistory)
+    //console.log("eventQueue:", foundUser.eventQueue)
     const response = getFiveFromQueue(req.user.id)
     res.status(200).json({
       status: 200,
