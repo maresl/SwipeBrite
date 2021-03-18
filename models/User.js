@@ -37,6 +37,24 @@ var UserSchema = new Schema({
       ref: "Event",
     },
   ],
+
+  eventQueue: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      }
+    ],
+
+  eventHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      }
+    ],
+
+  currentLatLng: {
+    type: String
+  }
 });
 
 const User = mongoose.model("User", UserSchema);
