@@ -10,31 +10,31 @@ const newEvents = async (req, res) => {
     const newLocation = `${req.body.lat} ${req.body.lng}` // formatting the Location data to match User model
 
     if (foundUser.currentLatLng !== newLocation || foundUser.eventQueue.length < 5) { // Only need to proceed if the Location has changed or the queue is too short:
-      
-      console.log('calling ticketmaster')
+
+      //console.log('calling ticketmaster')
 
       await User.findByIdAndUpdate(foundUser._id, {currentLatLng: newLocation}) // save the new location to the user < this is not working
 
       const newTMEventsData = await getNewEvents({...req.body});
-      // console.log(newTMEventsData.data);
-
 
       const eventsForQueue = newTMEventsData.data._embedded.events;
 
-      let newEvents = []
-
-
-
       for (let i = 0; i < eventsForQueue.length; i++) {
 
-        let existingEvent = await Event.findOne({eventID: eventsForQueue[i].id}) // TODO : figure out how to find by the event name // see if this event already exists
-        //console.log("EXISTING EVENT:", existingEvent.eventID)
+        let existingEvent = await Event.findOne({eventID: eventsForQueue[i].id}) // see if the event already exists
 
         let inHistory = -1
-        if (existingEvent) {
-          inHistory = foundUser.eventHistory.indexOf(existingEvent._id) // if the event already exists, see if the user already reviewed it
-        }
-        if (inHistory === -1) { // if the user hasn't already reviewed it, put it it in the array which will be added to the queue
+        if (existingEvent) { 
+          inHistory = foundUser.eventHistory.indexOf(existingEvent._id) // if the event already exists, see if the user already has already seen it
+          if (inHistory === -1) { 
+            //console.log(`adding existing event ${existingEvent.eventID} to ${foundUser.email}'s queue`)
+            foundUser.eventHistory.push(existingEvent._id)
+            foundUser.eventQueue.push(existingEvent._id)
+            await foundUser.save()
+          } else { // otherwise it has already been in their queue at some point, skip it
+            //console.log(`skippping ${existingEvent.eventID} as the user has it in their history`)
+          }
+        } else { // if the event doesn't exist, create it and add it to the queue
           
           const newEvent = await Event.create({
             eventID: eventsForQueue[i].id,
@@ -47,18 +47,28 @@ const newEvents = async (req, res) => {
               name: eventsForQueue[i]["_embedded"].venues[0].name,
             }, // image url not handled yet
           });
-          console.log("new event:", newEvent.eventID)
+          //console.log("Created new event:", newEvent.eventID)
           foundUser.eventHistory.push(newEvent._id)
           foundUser.eventQueue.push(newEvent._id)
           await foundUser.save()
-        } else {
-          console.log("skipping ", eventsForQueue[i].id)
         }
       };
     }
-    //console.log("eventHistory:", foundUser.eventHistory)
-    //console.log("eventQueue:", foundUser.eventQueue)
-    const response = getFiveFromQueue(req.user.id)
+    // Uncomment to see what eventIDs a user has in their history after this whole thing runs:
+    //let userWithEventHistory = await User.findOne(foundUser._id).populate('eventHistory')
+    // let eventIds = []
+    // userWithEventHistory.eventHistory.forEach((populatedEvent) => {
+    //   eventIds.push(populatedEvent.eventID)
+    // })
+    // console.log("eventIds:", eventIds)
+    const response = []
+
+    let userWithQueue = await User.findOne(foundUser._id).populate('eventQueue')
+
+    for (let i = 0; i < 6; i++ ) {
+      response.push(userWithQueue.eventQueue[i])
+    }
+
     res.status(200).json({
       status: 200,
       response,
@@ -74,9 +84,6 @@ const newEvents = async (req, res) => {
   }
 };
 
-const getFiveFromQueue = (userId) => {
-  return userId // TODO: figure out if this has to be async or maybe even not it's own function
-}
 
 const showLikedEvents = async (req, res) => {
   try {
