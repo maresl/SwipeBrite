@@ -19,9 +19,10 @@ const create = async (req, res) => {
 
     //hash password
     const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, function (err, hash) {
-      password = hash;
-    });
+    const salt = await bcrypt.genSaltSync(saltRounds);
+    const hash = await bcrypt.hashSync(password, salt);
+
+    password = hash;
 
     const newUserData = {
       email,
@@ -51,7 +52,6 @@ const create = async (req, res) => {
 
 /* NOTE Login */
 const login = async (req, res) => {
-  console.log("made it to controller");
   try {
     let email = req.body.email;
     let password = req.body.password;
@@ -60,8 +60,7 @@ const login = async (req, res) => {
       throw "emptyForm";
     }
 
-    const foundUser = await User.findOne({ email: email }).exec();
-    console.log(email, "foundUser:", foundUser, password);
+    const foundUser = await User.findOne({ email });
 
     //test if user/email does NOT exist in the database
     if (!foundUser) {
@@ -71,6 +70,7 @@ const login = async (req, res) => {
 
     //test if user's password matches what's in the database
     const isMatch = await bcrypt.compare(password, foundUser.password);
+
     if (isMatch) {
       const signedJwt = jwt.createToken(foundUser);
 
