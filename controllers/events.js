@@ -13,6 +13,8 @@ const newEvents = async (req, res) => {
     //   "events"
     // ]; // an array of TM event objects
 
+    console.log(newTMEventsData.data);
+
     const response = newTMEventsData.data._embedded.events;
 
     const newEvents = [];
