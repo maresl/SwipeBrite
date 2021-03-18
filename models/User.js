@@ -7,10 +7,9 @@ var UserSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
 
-  password: { type: String, required: true, minLength: 5, maxLength: 15 },
+  password: { type: String, required: true, minLength: 5 },
 
   //may need to take img string and split[,][1] witbh type base64 as per mongoose
   avatar: {

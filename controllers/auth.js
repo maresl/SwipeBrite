@@ -4,8 +4,8 @@ const jwt = require("../auth/jwt");
 
 const create = async (req, res) => {
   try {
-    let { password } = req.body;
-    const { email } = req.body;
+    let email = req.body.email;
+    let password = req.body.password;
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
@@ -19,25 +19,29 @@ const create = async (req, res) => {
 
     //hash password
     const saltRounds = 10;
-    bcrypt.hash(password, saltRounds, function (err, hash) {
-      password = hash;
-    });
+    const salt = await bcrypt.genSaltSync(saltRounds);
+    const hash = await bcrypt.hashSync(password, salt);
+
+    password = hash;
 
     const newUserData = {
       email,
       password,
     };
 
-    const newUserProfile = await User.create({ newUserData });
+    const newUserProfile = await User.create(newUserData);
+
     const token = jwt.createToken(newUserProfile);
 
     return res.status(201).json({
       status: 201,
       token,
+      newUserProfile,
       message: "New user created, booyah!",
       requestAt: new Date().toLocaleString(),
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: 500,
       message: "Something went wrong!",
@@ -49,22 +53,24 @@ const create = async (req, res) => {
 /* NOTE Login */
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
+    let email = req.body.email;
+    let password = req.body.password;
     //test for empty credential input
     if (email === "" || password === "") {
       throw "emptyForm";
     }
 
-    const foundUser = await db.User.findOne({ email });
+    const foundUser = await User.findOne({ email });
 
     //test if user/email does NOT exist in the database
     if (!foundUser) {
+      console.log("user not found,");
       throw "invalidUser";
     }
 
     //test if user's password matches what's in the database
     const isMatch = await bcrypt.compare(password, foundUser.password);
+
     if (isMatch) {
       const signedJwt = jwt.createToken(foundUser);
 
@@ -89,7 +95,7 @@ const login = async (req, res) => {
       });
     }
 
-    console.log(error);
+    // console.log(error);
   }
 };
 
