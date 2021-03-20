@@ -78,6 +78,7 @@ const newEvents = async (req, res) => {
             eventID: eventsForQueue[i].id,
             priceRange: eventsForQueue[i].priceRanges[0].min,
             dates: eventsForQueue[i].dates.start.localDate,
+            name: eventsForQueue[i].name,
             images: receivedImages,
             eventURL: eventsForQueue[i].url,
             description: eventsForQueue[i].info,
