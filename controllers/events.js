@@ -18,16 +18,14 @@ const newEvents = async (req, res) => {
 
       //console.log('calling ticketmaster')
 
-      if (foundUser.eventHistory.length < 5) {
-        await User.findOneAndUpdate(
-          { _id: foundUser._id },
-          {
-            $inc: {
-              visitedPage: 1,
-            },
-          }
-        );
-      }
+      await User.findOneAndUpdate(
+        { _id: foundUser._id },
+        {
+          $inc: {
+            visitedPage: 1,
+          },
+        }
+      );
 
       //*
       if (foundUser.currentLatLng != newLocation) {
@@ -36,6 +34,7 @@ const newEvents = async (req, res) => {
           {
             $set: {
               currentLocation: newLocation,
+              //visitedPage:0?
             },
           }
         );
@@ -45,7 +44,10 @@ const newEvents = async (req, res) => {
       //   currentLatLng: newLocation,
       // }); // save the new location to the user < this is not working
 
-      const newTMEventsData = await getNewEvents({ ...req.body });
+      const newTMEventsData = await getNewEvents(
+        { ...req.body },
+        foundUser.visitedPage
+      );
 
       const eventsForQueue = newTMEventsData.data._embedded.events;
 
@@ -106,11 +108,8 @@ const newEvents = async (req, res) => {
 
     for (let i = 0; i < 6; i++) {
       response.push(userWithQueue.eventQueue[i]);
-      console.log(userWithQueue.eventHistory.length);
-      userWithQueue.eventHistory.splice(i, 3);
-      console.log(foundUser.visitedPage);
       await User.findByIdAndUpdate(foundUser._id, {
-        eventHistory: [],
+        eventQueue: [],
       });
     }
 
