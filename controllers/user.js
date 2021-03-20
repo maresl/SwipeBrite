@@ -24,8 +24,6 @@ const updateUserEventPreferences = async (req, res) => {
     if (filteredDecision) {
   
       foundUser[filteredDecision].push(existingEvent._id)
-
-      console.log("foundUser.eventQueue.indexOf(existingEvent._id)", foundUser.eventQueue.indexOf(existingEvent._id))
       foundUser.eventQueue.splice(foundUser.eventQueue.indexOf(existingEvent._id),1)
 
       await foundUser.save()
