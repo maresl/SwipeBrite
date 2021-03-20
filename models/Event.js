@@ -15,6 +15,12 @@ const EventSchema = mongoose.Schema({
     default: undefined,
   },
 
+  images: [
+    {
+      type: String,
+    },
+  ],
+
   //TM API Events->url
   eventURL: {
     type: String,
@@ -35,7 +41,7 @@ const EventSchema = mongoose.Schema({
   venue: {
     name: {
       type: String,
-    }
+    },
   },
 });
 
