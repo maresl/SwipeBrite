@@ -87,7 +87,7 @@ const newEvents = async (req, res) => {
               name: eventsForQueue[i]["_embedded"].venues[0].name,
             }, // image url not handled yet
           });
-          console.log("Created new event:", newEvent.eventID);
+          // console.log("Created new event:", newEvent.eventID);
           foundUser.eventHistory.push(newEvent._id);
           foundUser.eventQueue.push(newEvent._id);
           await foundUser.save();
@@ -109,9 +109,6 @@ const newEvents = async (req, res) => {
 
     for (let i = 0; i < 6; i++) {
       response.push(userWithQueue.eventQueue[i]);
-      await User.findByIdAndUpdate(foundUser._id, {
-        eventQueue: [],
-      });
     }
 
     res.status(200).json({
