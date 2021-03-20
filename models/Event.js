@@ -5,6 +5,10 @@ const EventSchema = mongoose.Schema({
   eventID: {
     type: String,
   },
+
+  name: {
+    type: String,
+  },
   //TM API Events -> Price Range
   priceRange: {
     type: Number,

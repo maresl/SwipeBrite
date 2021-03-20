@@ -7,6 +7,7 @@ const newEvents = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
 
+    console.log(foundUser);
     const newLocation = `${req.body.lat} ${req.body.lng}`; // formatting the Location data to match User model
 
     if (
@@ -17,11 +18,36 @@ const newEvents = async (req, res) => {
 
       //console.log('calling ticketmaster')
 
-      await User.findByIdAndUpdate(foundUser._id, {
-        currentLatLng: newLocation,
-      }); // save the new location to the user < this is not working
+      await User.findOneAndUpdate(
+        { _id: foundUser._id },
+        {
+          $inc: {
+            visitedPage: 1,
+          },
+        }
+      );
 
-      const newTMEventsData = await getNewEvents({ ...req.body });
+      //*
+      if (foundUser.currentLatLng != newLocation) {
+        await User.findOneAndUpdate(
+          { _id: foundUser._id },
+          {
+            $set: {
+              currentLocation: newLocation,
+              //visitedPage:0?
+            },
+          }
+        );
+      }
+
+      // await User.findByIdAndUpdate(foundUser._id, {
+      //   currentLatLng: newLocation,
+      // }); // save the new location to the user < this is not working
+
+      const newTMEventsData = await getNewEvents(
+        { ...req.body },
+        foundUser.visitedPage
+      );
 
       const eventsForQueue = newTMEventsData.data._embedded.events;
 
@@ -52,6 +78,7 @@ const newEvents = async (req, res) => {
             eventID: eventsForQueue[i].id,
             priceRange: eventsForQueue[i].priceRanges[0].min,
             dates: eventsForQueue[i].dates.start.localDate,
+            name: eventsForQueue[i].name,
             images: receivedImages,
             eventURL: eventsForQueue[i].url,
             description: eventsForQueue[i].info,
@@ -60,7 +87,7 @@ const newEvents = async (req, res) => {
               name: eventsForQueue[i]["_embedded"].venues[0].name,
             }, // image url not handled yet
           });
-          console.log("Created new event:", newEvent.eventID);
+          // console.log("Created new event:", newEvent.eventID);
           foundUser.eventHistory.push(newEvent._id);
           foundUser.eventQueue.push(newEvent._id);
           await foundUser.save();
