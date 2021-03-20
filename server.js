@@ -25,6 +25,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api/v1/events", indexRouter.events);
 app.use("/api/v1/auth", indexRouter.auth);
+app.use("/api/v1/user", indexRouter.user);
+
 //need to route user
 app.listen(PORT, () =>
   console.log(
