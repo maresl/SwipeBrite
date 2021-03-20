@@ -7,6 +7,7 @@ const newEvents = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
 
+    console.log(foundUser);
     const newLocation = `${req.body.lat} ${req.body.lng}`; // formatting the Location data to match User model
 
     if (
@@ -17,9 +18,32 @@ const newEvents = async (req, res) => {
 
       //console.log('calling ticketmaster')
 
-      await User.findByIdAndUpdate(foundUser._id, {
-        currentLatLng: newLocation,
-      }); // save the new location to the user < this is not working
+      if (foundUser.eventHistory.length < 5) {
+        await User.findOneAndUpdate(
+          { _id: foundUser._id },
+          {
+            $inc: {
+              visitedPage: 1,
+            },
+          }
+        );
+      }
+
+      //*
+      if (foundUser.currentLatLng != newLocation) {
+        await User.findOneAndUpdate(
+          { _id: foundUser._id },
+          {
+            $set: {
+              currentLocation: newLocation,
+            },
+          }
+        );
+      }
+
+      // await User.findByIdAndUpdate(foundUser._id, {
+      //   currentLatLng: newLocation,
+      // }); // save the new location to the user < this is not working
 
       const newTMEventsData = await getNewEvents({ ...req.body });
 
@@ -82,6 +106,12 @@ const newEvents = async (req, res) => {
 
     for (let i = 0; i < 6; i++) {
       response.push(userWithQueue.eventQueue[i]);
+      console.log(userWithQueue.eventHistory.length);
+      userWithQueue.eventHistory.splice(i, 3);
+      console.log(foundUser.visitedPage);
+      await User.findByIdAndUpdate(foundUser._id, {
+        eventHistory: [],
+      });
     }
 
     res.status(200).json({
