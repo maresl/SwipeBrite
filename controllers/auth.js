@@ -6,10 +6,12 @@ const create = async (req, res) => {
   try {
     let email = req.body.email;
     let password = req.body.password;
+    console.log(email, password);
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
     if (duplicateUser) {
+      console.log("DuplicateUser");
       return res.status().json({
         status: 400,
         message: "User already exists!",
@@ -28,6 +30,7 @@ const create = async (req, res) => {
       email,
       password,
     };
+    console.log("made it here");
 
     const newUserProfile = await User.create(newUserData);
 
