@@ -6,8 +6,11 @@ const getNewEvents = require("../services/tmQueryService/tmEventQueries.js");
 const newEvents = async (req, res) => {
   try {
     console.log("got inside newEvents trycatch")
+    let response = []
+    let isLoggedIn = ''
     if (req.user) { // check to see if the user is logged in
       console.log("logged in")
+      isLoggedIn = 'True'
       const foundUser = await User.findById(req.user.id);
 
       console.log(foundUser);
@@ -88,7 +91,7 @@ const newEvents = async (req, res) => {
               classifications: eventsForQueue[i].classifications[0].segment.name,
               venue: {
                 name: eventsForQueue[i]["_embedded"].venues[0].name,
-              }, // image url not handled yet
+              },
             });
             // console.log("Created new event:", newEvent.eventID);
             foundUser.eventHistory.push(newEvent._id);
@@ -104,7 +107,6 @@ const newEvents = async (req, res) => {
       //   eventIds.push(populatedEvent.eventID)
       // })
       // console.log("eventIds:", eventIds)
-      const response = [];
 
       let userWithQueue = await User.findOne(foundUser._id).populate(
         "eventQueue"
@@ -114,20 +116,46 @@ const newEvents = async (req, res) => {
         response.push(userWithQueue.eventQueue[i]);
       }
 
-      res.status(200).json({
-        status: 200,
-        response,
-        requestAt: new Date().toLocaleString(),
-      });
     } else { // if the user is not logged in
+
       console.log("not logged in functionality")
-      const response = ['you aint logged in'];
-      res.status(200).json({
-        status: 200,
-        response,
-        requestAt: new Date().toLocaleString(),
-      });
+
+      isLoggedIn = 'False'
+      
+      const newTMEventsData = await getNewEvents(
+        { ...req.body },
+        0
+      );
+
+      const eventsForQueue = newTMEventsData.data._embedded.events;
+
+      for (let i = 0; i < eventsForQueue.length; i++) {
+          let receivedImages = [];
+          eventsForQueue[i].images.map((url) => {
+            receivedImages.push(url.url);
+          });
+          response.push({
+            eventID: eventsForQueue[i].id,
+            priceRange: eventsForQueue[i].priceRanges[0].min,
+            dates: eventsForQueue[i].dates.start.localDate,
+            name: eventsForQueue[i].name,
+            images: receivedImages,
+            eventURL: eventsForQueue[i].url,
+            description: eventsForQueue[i].info,
+            classifications: eventsForQueue[i].classifications[0].segment.name,
+            venue: {
+              name: eventsForQueue[i]["_embedded"].venues[0].name,
+            },
+          })
+      }
     }
+    res.status(200).json({
+      status: 200,
+      response,
+      requestAt: new Date().toLocaleString(),
+      isLoggedIn
+    });
+
   } catch (error) {
     console.log(error);
     res.status(500).json({
