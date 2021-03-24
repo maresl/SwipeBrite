@@ -6,15 +6,12 @@ const create = async (req, res) => {
   try {
     let email = req.body.email;
     let password = req.body.password;
+    console.log(email, password);
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
     if (duplicateUser) {
-      return res.status().json({
-        status: 400,
-        message: "User already exists!",
-        requestAt: new Date().toLocaleString(),
-      });
+      throw "duplicateUser";
     }
 
     //hash password
@@ -28,6 +25,7 @@ const create = async (req, res) => {
       email,
       password,
     };
+    console.log("made it here");
 
     const newUserProfile = await User.create(newUserData);
 
@@ -41,7 +39,14 @@ const create = async (req, res) => {
       requestAt: new Date().toLocaleString(),
     });
   } catch (error) {
-    console.log(error);
+    if (error === "duplicateUser") {
+      console.log("dupe");
+      return res.status(400).json({
+        status: 400,
+        message: "User already exists!",
+        requestAt: new Date().toLocaleString(),
+      });
+    }
     return res.status(500).json({
       status: 500,
       message: "Something went wrong!",

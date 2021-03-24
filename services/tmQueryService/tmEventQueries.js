@@ -34,11 +34,11 @@ const eventConfig = {
  * @param {} latLong
  * I'm expecting latLong to be an object with fields lat, long.
  */
-const getAllEvents = async (latLong) => {
+const getAllEvents = async (latLong, page) => {
   try {
-    console.log(latLong.lat, latLong.long);
+    console.log(latLong.lat, latLong.lng);
     return await axios.get(
-      `https://app.ticketmaster.com/discovery/v2/events?apikey=${process.env.TICKETMASTER_API_KEY}&latlong=${latLong.lat},${latLong.long}&radius=25&locale=*`
+      `https://app.ticketmaster.com/discovery/v2/events?apikey=${process.env.TICKETMASTER_API_KEY}&latlong=${latLong.lat},${latLong.lng}&radius=25&locale=*&page=${page}`
     );
   } catch (error) {
     console.log(error);
