@@ -59,6 +59,7 @@ var UserSchema = new Schema({
 
   currentLatLng: {
     type: String,
+    default: ""
   },
 });
 
