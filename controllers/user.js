@@ -19,8 +19,7 @@ const updateUserEventPreferences = async (req, res) => {
     })
 
     const filteredDecision = filter(req.body.decision);
-    //console.log("eventQueue:", foundUser.eventQueue)
-
+    
     if (filteredDecision) {
   
       foundUser[filteredDecision].push(existingEvent._id)
@@ -30,10 +29,6 @@ const updateUserEventPreferences = async (req, res) => {
     } else {
       throw "invalidDecision"
     }
-      // console.log("liked events:", foundUser.likedEvents)
-      // console.log("disliked events:", foundUser.dislikedEvents)
-      // console.log("blacklist events:", foundUser.blacklistEvents)
-      //console.log("eventQueue:", foundUser.eventQueue)
 
     res.status(200).json({
       status: 200,
