@@ -78,9 +78,10 @@ const newEvents = async (req, res) => {
                 eventsForQueue[i].images.map((url) => { 
                   receivedImages.push(url.url);
                 });
+                const priceRangeConditional = (eventsForQueue[i].priceRanges) ? eventsForQueue[i].priceRanges[0].min : 0
                 const newEvent = await Event.create({
                   eventID: eventsForQueue[i].id,
-                  priceRange: eventsForQueue[i].priceRanges[0].min,
+                  priceRange: priceRangeConditional,
                   dates: eventsForQueue[i].dates.start.localDate,
                   name: eventsForQueue[i].name,
                   images: receivedImages,
