@@ -172,17 +172,12 @@ const newEvents = async (req, res) => {
 const showLikedEvents = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
-
-    const likedEvents = [];
-
-    for (const event of foundUser.likedEvents) {
-      const foundEvent = await db.Events.findById(event);
-      likedEvents.push(foundEvent);
-    }
-
+    const userWithLikedEvents = await User.findOne(foundUser._id).populate(
+      "likedEvents"
+    );
     return res.status(200).json({
       status: 200,
-      likedEvents,
+      likedEvents: userWithLikedEvents.likedEvents,
       requestedAt: new Date().toLocaleString(),
     });
   } catch (error) {
