@@ -11,14 +11,14 @@ i.e. req.body.decision = blacklist, req.body.decision = liked, req.body.decision
 const profile = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
-    console.log(
-      "🚀 ~ file: user.js ~ line 14 ~ profile ~ foundUser",
-      foundUser
-    );
-    console.log(
-      "🚀 ~ file: user.js ~ line 17 ~ profile ~ req.user.id",
-      req.user.id
-    );
+    // console.log(
+    //   "🚀 ~ file: user.js ~ line 14 ~ profile ~ foundUser",
+    //   foundUser
+    // );
+    // console.log(
+    //   "🚀 ~ file: user.js ~ line 17 ~ profile ~ req.user.id",
+    //   req.user.id
+    // );
 
     res.status(200).json({
       status: 200,

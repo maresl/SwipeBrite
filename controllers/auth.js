@@ -25,7 +25,6 @@ const create = async (req, res) => {
       email,
       password,
     };
-    console.log("made it here");
 
     const newUserProfile = await User.create(newUserData);
 

@@ -18,29 +18,16 @@ const newEvents = async (req, res) => {
       const newLocation = `${req.body.lat.toFixed(2)} ${req.body.lng.toFixed(2)}`; // formatting the Location data to match User model
 
       if (foundUser.currentLatLng !== newLocation) {
-        await User.findOneAndUpdate(
-          { _id: foundUser._id },
-          {
-            $set: {
-              currentLatLng: newLocation,
-              //visitedPage:0?
-            },
-          }
-        );
+        foundUser.currentLatLng = newLocation
+        foundUser.visitedPage = 0
+        await foundUser.save()
       }
 
       if (foundUser.currentLatLng !== newLocation || foundUser.eventQueue.length < 5) {
 
         // Only need to proceed if the Location has changed or the queue is too short:
-          await User.findOneAndUpdate(
-            { _id: foundUser._id },
-            {
-              $inc: {
-                visitedPage: 1,
-              },
-            }
-          );
 
+        const loggedInGetEventsFromTicketMaster = async () => {
           const newTMEventsData = await getNewEvents(
             { ...req.body },
             foundUser.visitedPage
@@ -90,6 +77,15 @@ const newEvents = async (req, res) => {
               await foundUser.save();
             }
           }
+        }
+        const preRunQueueLength = foundUser.eventQueue.length
+        await loggedInGetEventsFromTicketMaster()
+        if (preRunQueueLength === foundUser.eventQueue.length) { // if the queue didn't get any longer
+          foundUser.visitedPage++ // go to the next page
+          await foundUser.save()
+          await loggedInGetEventsFromTicketMaster() // try ticketmaster again
+        }
+
       }
       // Uncomment to see what eventIDs a user has in their history after this whole thing runs:
       //let userWithEventHistory = await User.findOne(foundUser._id).populate('eventHistory')
@@ -108,8 +104,6 @@ const newEvents = async (req, res) => {
       }
 
     } else { // if the user is not logged in
-
-      console.log("not logged in functionality")
       
       const newTMEventsData = await getNewEvents(
         { ...req.body },
