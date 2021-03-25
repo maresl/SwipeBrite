@@ -8,26 +8,52 @@ Expecting: req to contain req.body.eventid --> the id that the user made a decis
 Expecting: req to contain whether they liked, disliked, or blacklisted the event in the form of a decision 
 i.e. req.body.decision = blacklist, req.body.decision = liked, req.body.decision = disliked,  
 */
-const updateUserEventPreferences = async (req, res) => {
-
+const profile = async (req, res) => {
   try {
+    const foundUser = await User.findById(req.user.id);
+    console.log(
+      "🚀 ~ file: user.js ~ line 14 ~ profile ~ foundUser",
+      foundUser
+    );
+    console.log(
+      "🚀 ~ file: user.js ~ line 17 ~ profile ~ req.user.id",
+      req.user.id
+    );
 
+    res.status(200).json({
+      status: 200,
+      requestedAt: new Date().toLocaleString(),
+      foundUser,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      message: err,
+      requestAt: new Date().toLocaleString(),
+    });
+  }
+};
+
+const updateUserEventPreferences = async (req, res) => {
+  try {
     const foundUser = await User.findById(req.user.id);
 
     let existingEvent = await Event.findOne({
       eventID: req.body.eventID,
-    })
+    });
 
     const filteredDecision = filter(req.body.decision);
     
     if (filteredDecision) {
-  
-      foundUser[filteredDecision].push(existingEvent._id)
-      foundUser.eventQueue.splice(foundUser.eventQueue.indexOf(existingEvent._id),1)
+      foundUser[filteredDecision].push(existingEvent._id);
+      foundUser.eventQueue.splice(
+        foundUser.eventQueue.indexOf(existingEvent._id),
+        1
+      );
 
-      await foundUser.save()
+      await foundUser.save();
     } else {
-      throw "invalidDecision"
+      throw "invalidDecision";
     }
 
     res.status(200).json({
@@ -53,6 +79,7 @@ const updateUserEventPreferences = async (req, res) => {
 
 const userController = {
   updateUserEventPreferences,
+  profile,
 };
 
 module.exports = userController;
