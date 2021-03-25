@@ -8,6 +8,59 @@ Expecting: req to contain req.body.eventid --> the id that the user made a decis
 Expecting: req to contain whether they liked, disliked, or blacklisted the event in the form of a decision 
 i.e. req.body.decision = blacklist, req.body.decision = liked, req.body.decision = disliked,  
 */
+const updateUser = async (req, res) => {
+  try {
+    console.log(
+      "🚀 ~ file: user.js ~ line 16 ~ updateUser ~ req.body.email",
+      req.body.email
+    );
+    const foundUser = await User.findOne(req.body.id);
+    console.log(
+      "🚀 ~ file: user.js ~ line 18 ~ updateUser ~ foundUser",
+      foundUser
+    );
+
+    if (req.body.email === foundUser.email) {
+      console.log("stuff");
+      throw "email must be different";
+    }
+
+    const found = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        $set: {
+          ...req.body,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({
+      status: 200,
+      found,
+      requestedAt: new Date().toLocaleString(),
+    });
+  } catch (error) {
+    if (error === "userNotFound") {
+      res.status(404).json({
+        status: 404,
+        message: "User Not Found!",
+      });
+    } else if (error === "email must be different") {
+      res.status(401).json({
+        message: "bad request",
+      });
+    } else {
+      res.status(500).json({
+        status: 500,
+        message: error,
+        requestAt: new Date().toLocaleString(),
+      });
+    }
+  }
+};
+
 const profile = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
@@ -85,6 +138,7 @@ const updateUserEventPreferences = async (req, res) => {
 const userController = {
   updateUserEventPreferences,
   profile,
+  updateUser,
 };
 
 module.exports = userController;

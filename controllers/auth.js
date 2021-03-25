@@ -2,11 +2,12 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("../auth/jwt");
 
+const updateUser = async (req, res) => {};
+
 const create = async (req, res) => {
   try {
     let email = req.body.email;
     let password = req.body.password;
-    console.log(email, password);
     const duplicateUser = await User.findOne({ email });
 
     //test for duplicate users
@@ -40,7 +41,6 @@ const create = async (req, res) => {
     });
   } catch (error) {
     if (error === "duplicateUser") {
-      console.log("dupe");
       return res.status(400).json({
         status: 400,
         message: "User already exists!",
@@ -107,6 +107,7 @@ const login = async (req, res) => {
 const authCtrl = {
   create,
   login,
+  updateUser,
 };
 
 module.exports = authCtrl;
