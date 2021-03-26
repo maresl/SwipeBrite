@@ -8,7 +8,33 @@ Expecting: req to contain req.body.eventid --> the id that the user made a decis
 Expecting: req to contain whether they liked, disliked, or blacklisted the event in the form of a decision 
 i.e. req.body.decision = blacklist, req.body.decision = liked, req.body.decision = disliked,  
 */
-const updateUserData = async (req, res) => {};
+const updateUserData = async (req, res) => {
+  try {
+    const foundUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        $set: {
+          ...req.body,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      status: 200,
+      requestedAt: new Date().toLocaleString(),
+      foundUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: error,
+      requestAt: new Date().toLocaleString(),
+    });
+  }
+};
 const profile = async (req, res) => {
   try {
     const foundUser = await User.findById(req.user.id);
@@ -81,6 +107,7 @@ const updateUserEventPreferences = async (req, res) => {
 const userController = {
   updateUserEventPreferences,
   profile,
+  updateUserData,
 };
 
 module.exports = userController;
