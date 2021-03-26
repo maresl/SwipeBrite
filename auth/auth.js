@@ -15,9 +15,9 @@ const authenticateJWT = (req, res, next) => {
 };
 
 const optionalAuthenticateJWT = (req, res, next) => {
-  console.log("got to optionalAuthenticateJWT")
+
   try {
-    console.log("got to optionalAuthenticateJWT try catch")
+
     if (req.headers.authorization) {
       const authHeader = req.headers.authorization;
       const token = authHeader.split(" ")[1];
