@@ -72,12 +72,20 @@ const updateUserEventPreferences = async (req, res) => {
     const filteredDecision = filter(req.body.decision);
 
     if (filteredDecision) {
-      foundUser[filteredDecision].push(existingEvent._id);
-      foundUser.eventQueue.splice(
-        foundUser.eventQueue.indexOf(existingEvent._id),
-        1
-      );
 
+      if (foundUser.eventQueue.indexOf(existingEvent._id) !== -1) {
+        foundUser.eventQueue.splice(
+          foundUser.eventQueue.indexOf(existingEvent._id),
+          1
+        );
+      }
+      if (foundUser.likedEvents.indexOf(existingEvent._id) !== -1) {
+        foundUser.likedEvents.splice(
+          foundUser.likedEvents.indexOf(existingEvent._id),
+          1
+        );
+      }
+      foundUser[filteredDecision].push(existingEvent._id);
       await foundUser.save();
     } else {
       throw "invalidDecision";
