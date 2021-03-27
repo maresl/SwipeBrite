@@ -1,10 +1,12 @@
-const express = require('express');
-const router = express.Router();
+const events = require('./events')
+const auth = require('./auth')
+const user = require('./user')
 
-const indexCtrl = require('../controllers/index.js')
 
+const routes = {
+    events, 
+    auth,
+    user
+}
 
-// User Routes
-router.get('/', indexCtrl.index );
-
-module.exports = router;
+module.exports = routes

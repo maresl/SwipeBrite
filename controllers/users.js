@@ -1,6 +1,6 @@
 const db = require('../config/database')
 
-const index = async ( req, res ) => {
+const indexUsers = async ( req, res ) => {
     try {
       //const events = await dbCall;
 
@@ -19,8 +19,8 @@ const index = async ( req, res ) => {
     };
   };
 
-const indexCtrl = {
-  index,
+const usersCtrl = {
+    indexUsers,
 }
 
-module.exports = indexCtrl;
+module.exports = usersCtrl;
